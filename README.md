@@ -34,6 +34,14 @@ docker compose run --rm k6 run /scripts/01-smoke.js
 | Grafana (dashboards) | http://localhost:3000 |
 | Prometheus (raw metrics) | http://localhost:9090 |
 
+**Tag each run** to filter results in the Grafana dashboard by test execution:
+
+```bash
+K6_PROMETHEUS_RW_TAGS=testid=smoke-01 MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/01-smoke.js
+```
+
+Use the **Test Run** dropdown in Grafana to select a specific run.
+
 
 > **Windows (Git Bash):** Git Bash converts Unix-style paths, causing k6 to fail finding the script.
 > Prefix the run command with `MSYS_NO_PATHCONV=1`:

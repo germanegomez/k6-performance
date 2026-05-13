@@ -43,6 +43,17 @@ docker compose run --rm k6 run /scripts/05-soak.js
 
 `--rm` removes the container after the run. Metrics are still persisted in Prometheus.
 
+### Tagging runs for comparison
+
+Pass a `testid` tag to identify each run in Grafana:
+
+```bash
+K6_PROMETHEUS_RW_TAGS=testid=smoke-01 MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/01-smoke.js
+K6_PROMETHEUS_RW_TAGS=testid=load-01  MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/02-load.js
+```
+
+In Grafana, use the **Test Run** dropdown at the top of the dashboard to filter by a specific run or view all runs together.
+
 ---
 
 ## 3. View Results in Grafana
