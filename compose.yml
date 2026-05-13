@@ -1,28 +1,66 @@
 services:
+  httpbin:
+    image: mccutchen/go-httpbin:2.22.1
+    container_name: httpbin
+    ports:
+      - "8080:8080"
+    networks:
+      - k6-net
+  
   prometheus:
-    image: prom/prometheus:v2.53.0
+    image: prom/prometheus:v3.11.3
     container_name: prometheus
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --enable-feature=remote-write-receiver
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+      - "--enable-feature=remote-write-receiver"
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - k6-net
+    restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:13.0.1-security-01
     container_name: grafana
     ports:
       - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
-
-  k6:
-    image: grafana/k6:0.50.0
-    container_name: k6
-    command: run -o experimental-prometheus-rw=http://prometheus:9090/api/v1/write /scripts/01-smoke.js
-    volumes:
-      - ./scripts:/scripts:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - k6-net
     depends_on:
       - prometheus
+    restart: unless-stopped
+
+  k6:
+    image: grafana/k6:2.0.0
+    container_name: k6
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+    volumes:
+      - ./scripts:/scripts:ro
+    profiles:
+      - manual
+    networks:
+      - k6-net
+    depends_on:
+      - prometheus
+
+networks:
+  k6-net:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:
