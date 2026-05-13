@@ -2,7 +2,7 @@
 
 > A **k6 performance testing suite** with integrated observability — fully containerized, zero external dependencies.
 
-[![Smoke Test](https://github.com/germanegomez/k6-performance/actions/workflows/smoke.yml/badge.svg)](https://github.com/germanegomez/k6-performance/actions/workflows/smoke.yml)
+[![Smoke Test](https://github.com/germanegomez/k6-performance/actions/workflows/smoke.yml/badge.svg?branch=main)](https://github.com/germanegomez/k6-performance/actions/workflows/smoke.yml)
 [![k6](https://img.shields.io/badge/k6-2.0.0-7D64FF?logo=k6)](https://k6.io/)
 [![Prometheus](https://img.shields.io/badge/Prometheus-3.11.3-E6522C?logo=prometheus)](https://prometheus.io/)
 [![Grafana](https://img.shields.io/badge/Grafana-13.0.1-F46800?logo=grafana)](https://grafana.com/)
