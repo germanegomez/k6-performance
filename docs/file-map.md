@@ -48,6 +48,7 @@
 | File | Description |
 |---|---|
 | `copilot-instructions.md` | GitHub Copilot context and rules |
+| `workflows/smoke.yml` | CI workflow — runs smoke test on every push and PR to main |
 
 ## Root AI Tool Files
 
