@@ -9,6 +9,12 @@
 
 Five test scripts (smoke → soak) backed by a Prometheus + Grafana metrics stack. All services run locally via Docker Compose.
 
+| Tool | Role |
+|---|---|
+| **k6** | Load testing engine — runs scripts that simulate virtual users sending HTTP requests |
+| **Prometheus** | Time-series database — stores all metrics pushed by k6 via Remote Write |
+| **Grafana** | Visualization layer — queries Prometheus and renders real-time performance dashboards |
+
 ---
 
 ## Quick Start
@@ -21,8 +27,13 @@ cd k6-performance
 
 docker compose up -d
 docker compose run --rm k6 run /scripts/01-smoke.js
-# Open http://localhost:3000 to see results in Grafana
 ```
+
+| Service | URL |
+|---|---|
+| Grafana (dashboards) | http://localhost:3000 |
+| Prometheus (raw metrics) | http://localhost:9090 |
+
 
 > **Windows (Git Bash):** Git Bash converts Unix-style paths, causing k6 to fail finding the script.
 > Prefix the run command with `MSYS_NO_PATHCONV=1`:
