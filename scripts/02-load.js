@@ -14,7 +14,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/get');
+  const res = http.get('http://httpbin:8080/get');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(1);
 }

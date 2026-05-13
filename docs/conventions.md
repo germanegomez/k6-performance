@@ -29,7 +29,7 @@ export const options = {
 
 // 2. Default function — the virtual user scenario
 export default function () {
-  const res = http.get('http://httpbin/<endpoint>');
+  const res = http.get('http://httpbin:8080/<endpoint>');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(N);   // Always include a sleep to avoid hammering
 }
@@ -41,7 +41,7 @@ export default function () {
 - Always define `thresholds` — scripts without thresholds will not fail the run on regressions.
 - Always call `check()` on every response to track the pass/fail rate.
 - Always include a `sleep()` to model realistic user think time.
-- Target URLs must use internal Docker DNS names (e.g., `http://httpbin/...`), not `localhost`.
+- Target URLs must use internal Docker DNS names (e.g., `http://httpbin:8080/...`), not `localhost`.
 
 ## Thresholds by Test Type
 

@@ -14,7 +14,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/delay/1'); // Sustained latency helps surface memory leaks
+  const res = http.get('http://httpbin:8080/delay/1'); // Sustained latency helps surface memory leaks
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(0.5);
 }

@@ -62,7 +62,7 @@ The project runs a **fully containerized performance testing stack** on a single
    docker compose run --rm k6 run /scripts/01-smoke.js
 
 2. k6 executes the script:
-   - Sends HTTP requests to httpbin (http://httpbin/<endpoint>)
+   - Sends HTTP requests to httpbin (http://httpbin:8080/<endpoint>)
    - Collects metrics (duration, errors, VUs, etc.)
 
 3. k6 pushes metrics:
@@ -87,7 +87,7 @@ The project runs a **fully containerized performance testing stack** on a single
 | Grafana | `grafana` | `3000` |
 | k6 | `k6` | none |
 
-All inter-service communication uses internal Docker DNS names (e.g., `http://httpbin/get`).
+All inter-service communication uses internal Docker DNS names (e.g., `http://httpbin:8080/get`).
 
 ## Volumes
 

@@ -24,6 +24,13 @@ docker compose run --rm k6 run /scripts/01-smoke.js
 # Open http://localhost:3000 to see results in Grafana
 ```
 
+> **Windows (Git Bash):** Git Bash converts Unix-style paths, causing k6 to fail finding the script.
+> Prefix the run command with `MSYS_NO_PATHCONV=1`:
+> ```bash
+> MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/01-smoke.js
+> ```
+> PowerShell and CMD are not affected.
+
 For all commands, test scripts, and debugging: see [docs/development-workflow.md](docs/development-workflow.md).
 
 ---

@@ -62,7 +62,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/<endpoint>');
+  const res = http.get('http://httpbin:8080/<endpoint>');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(1);
 }
@@ -72,7 +72,7 @@ export default function () {
 
 | Rule | Reason |
 |---|---|
-| Use `http://httpbin/` not `http://localhost/` | Docker DNS routing |
+| Use `http://httpbin:8080/` not `http://localhost:8080/` | Docker DNS routing |
 | Do not use `require()` | k6 is not Node.js |
 | Always define `thresholds` | Pass/fail gate |
 | Always call `check()` | Response validation |

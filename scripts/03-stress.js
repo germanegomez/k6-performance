@@ -18,7 +18,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/delay/1'); // Simulates latency under stress
+  const res = http.get('http://httpbin:8080/delay/1'); // Simulates latency under stress
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(0.5);
 }

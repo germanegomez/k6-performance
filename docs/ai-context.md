@@ -43,7 +43,7 @@
 
 - **k6 runtime is not Node.js.** It supports ES module syntax and a subset of the Web API. `require()`, `fs`, `path`, `process`, and most Node.js built-ins are **not available**.
 - **No package manager.** k6 scripts cannot import npm packages directly. Use k6 built-in modules (`k6/http`, `k6/metrics`, `k6/checks`, etc.).
-- **Target URLs use Docker DNS names**, not `localhost`. All scripts must use `http://httpbin/...` — never `http://localhost:8080/...`.
+- **Target URLs use Docker DNS names**, not `localhost`. All scripts must use `http://httpbin:8080/...` — never `http://localhost:8080/...`.
 - **No `.env` file** — environment variables are declared in `compose.yml`.
 - **k6 profile is `manual`** — never remove or change this profile without understanding the side effects.
 
@@ -92,7 +92,7 @@
 1. Create `scripts/NN-<type>.js` with the next sequential number.
 2. Follow the structure in `docs/conventions.md`.
 3. Define `thresholds` matching the test type table in `docs/conventions.md`.
-4. Use `http://httpbin/<endpoint>` as target.
+4. Use `http://httpbin:8080/<endpoint>` as target.
 5. Update `docs/file-map.md`.
 
 ### Modifying an existing script
@@ -128,7 +128,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/<endpoint>');
+  const res = http.get('http://httpbin:8080/<endpoint>');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(N);
 }
@@ -137,7 +137,7 @@ export default function () {
 - Import only from `k6/*` built-in modules.
 - Always use `export const options` (named export).
 - Always use `export default function` for the scenario.
-- Target: `http://httpbin/` + valid httpbin endpoint.
+- Target: `http://httpbin:8080/` + valid httpbin endpoint.
 - Threshold values must use string format: `'rate<0.05'`, `'p(95)<1000'`.
 
 ---

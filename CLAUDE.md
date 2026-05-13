@@ -45,7 +45,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/<endpoint>');  // Docker DNS, not localhost
+  const res = http.get('http://httpbin:8080/<endpoint>');  // Docker DNS, not localhost
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(1);
 }

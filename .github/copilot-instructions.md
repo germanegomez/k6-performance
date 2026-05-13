@@ -31,7 +31,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/<endpoint>');
+  const res = http.get('http://httpbin:8080/<endpoint>');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(N);
 }
@@ -41,7 +41,7 @@ export default function () {
 
 ## Architecture Rules
 
-- **Target URLs must use Docker service names**, not `localhost`. Always `http://httpbin/...`.
+- **Target URLs must use Docker service names**, not `localhost`. Always `http://httpbin:8080/...`.
 - **k6 is not Node.js** — no `require()`, no npm, no `fs`/`path`/`process`.
 - **Only import from `k6/*`** built-in modules.
 - **Always define `thresholds`** — they are the pass/fail contract.
@@ -64,7 +64,7 @@ http.get('http://localhost:8080/get');
 export const options = { vus: 10, duration: '1m' };  // no thresholds
 
 // NEVER — no check
-export default function() { http.get('http://httpbin/get'); }
+export default function() { http.get('http://httpbin:8080/get'); }
 ```
 
 ---
@@ -94,7 +94,7 @@ export default function() { http.get('http://httpbin/get'); }
 1. Name: `0N-<type>.js` with next sequential number.
 2. Follow the standard script structure above.
 3. Use threshold values appropriate for the test type.
-4. Use `http://httpbin/<endpoint>` as target.
+4. Use `http://httpbin:8080/<endpoint>` as target.
 5. Update `docs/file-map.md`.
 
 ---
