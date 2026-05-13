@@ -1,0 +1,10 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+
+# k6 output files (if run with --out json=... or --out csv=...)
+*.json.gz
+results/
