@@ -49,7 +49,6 @@ services:
       - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
       - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
       - K6_OUT=experimental-prometheus-rw
-      - K6_PROMETHEUS_RW_TAGS
     volumes:
       - ./scripts:/scripts:ro
     profiles:

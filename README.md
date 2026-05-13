@@ -37,7 +37,7 @@ docker compose run --rm k6 run /scripts/01-smoke.js
 **Tag each run** to filter results in the Grafana dashboard by test execution:
 
 ```bash
-K6_PROMETHEUS_RW_TAGS=testid=smoke-01 MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/01-smoke.js
+MSYS_NO_PATHCONV=1 docker compose run --rm k6 run --tag testid=smoke-01 /scripts/01-smoke.js
 ```
 
 Use the **Test Run** dropdown in Grafana to select a specific run.

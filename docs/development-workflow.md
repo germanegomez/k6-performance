@@ -45,11 +45,11 @@ docker compose run --rm k6 run /scripts/05-soak.js
 
 ### Tagging runs for comparison
 
-Pass a `testid` tag to identify each run in Grafana:
+Pass a `--tag` flag to identify each run in Grafana:
 
 ```bash
-K6_PROMETHEUS_RW_TAGS=testid=smoke-01 MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/01-smoke.js
-K6_PROMETHEUS_RW_TAGS=testid=load-01  MSYS_NO_PATHCONV=1 docker compose run --rm k6 run /scripts/02-load.js
+MSYS_NO_PATHCONV=1 docker compose run --rm k6 run --tag testid=smoke-01 /scripts/01-smoke.js
+MSYS_NO_PATHCONV=1 docker compose run --rm k6 run --tag testid=load-01  /scripts/02-load.js
 ```
 
 In Grafana, use the **Test Run** dropdown at the top of the dashboard to filter by a specific run or view all runs together.
