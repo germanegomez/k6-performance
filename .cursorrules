@@ -1,0 +1,68 @@
+# Cursor Rules — k6-performance
+
+## Project Identity
+
+Dockerized k6 performance testing suite with Prometheus + Grafana observability.
+Stack: k6 v2 · go-httpbin · Prometheus v3 · Grafana v13 · Docker Compose.
+
+## Language & Runtime
+
+- Test scripts are JavaScript (ES modules), running in the **k6 runtime** (not Node.js).
+- No `require()`, no npm packages, no Node.js built-ins.
+- Only import from `k6/http`, `k6`, `k6/metrics`, `k6/execution`, etc.
+
+## URL Convention
+
+All HTTP calls in scripts MUST use Docker internal DNS:
+- Correct: `http://httpbin/get`
+- Wrong: `http://localhost:8080/get`
+
+## Script Template
+
+```js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [{ duration: 'Xm', target: N }],
+  thresholds: {
+    http_req_failed:   ['rate<0.05'],
+    http_req_duration: ['p(95)<1000'],
+  },
+};
+
+export default function () {
+  const res = http.get('http://httpbin/get');
+  check(res, { 'status is 200': (r) => r.status === 200 });
+  sleep(1);
+}
+```
+
+## Mandatory Elements in Every Script
+
+1. `export const options` with `thresholds`
+2. `check()` on every response
+3. `sleep()` at end of default function
+4. Target URL using Docker service name
+
+## File Naming
+
+Scripts: `NN-type.js` (e.g., `06-breakpoint.js`)
+
+## Off-Limits Files
+
+- `grafana/provisioning/dashboards/k6-dashboard.json` — do not edit
+- `grafana/provisioning/**/*.yml` — do not edit
+- `prometheus/prometheus.yml` — rarely needs changes; ask before modifying
+
+## compose.yml Rules
+
+- Keep k6 under `profiles: [manual]`
+- Keep `k6-net` on all services
+- Use `:ro` for config file mounts
+- Pin image versions (no `latest`)
+
+## No Secrets Policy
+
+Never write credentials, tokens, or passwords in scripts or compose.yml.
+Use `__ENV.VARIABLE_NAME` to read k6 environment variables.
