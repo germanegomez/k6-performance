@@ -1,0 +1,29 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start stack
+        run: docker compose up -d
+
+      - name: Wait for services to be ready
+        run: |
+          curl -sf --retry 15 --retry-delay 2 --retry-connrefused http://localhost:9090/-/ready
+          curl -sf --retry 15 --retry-delay 2 --retry-connrefused http://localhost:8080/get > /dev/null
+
+      - name: Run smoke test
+        run: docker compose run --rm k6 run /scripts/01-smoke.js
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
