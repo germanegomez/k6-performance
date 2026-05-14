@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     networks:
       - k6-net
+    restart: unless-stopped
   
   prometheus:
     image: prom/prometheus:v3.11.3
