@@ -42,6 +42,17 @@ services:
       - prometheus
     restart: unless-stopped
 
+  scalar:
+    image: scalarapi/api-reference:0.5.37
+    container_name: scalar
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./openapi.yml:/docs/openapi.yml:ro
+    networks:
+      - k6-net
+    restart: unless-stopped
+
   k6:
     image: grafana/k6:2.0.0
     container_name: k6

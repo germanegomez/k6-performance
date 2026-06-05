@@ -5,6 +5,7 @@
 | Path | Type | Description |
 |---|---|---|
 | `compose.yml` | Config | Docker Compose stack definition — all services, networks, volumes |
+| `openapi.yml` | Spec | OpenAPI 3.1.0 spec for go-httpbin — served by Scalar at http://localhost:8090 |
 | `README.md` | Docs | Project introduction, quick start, commands |
 | `LICENSE` | Legal | License file |
 
@@ -42,6 +43,7 @@
 | `development-workflow.md` | Setup, commands, debugging, CI/CD guidance |
 | `ai-context.md` | LLM-optimized context, constraints, safe change rules |
 | `file-map.md` | This file |
+| `scalar.md` | Scalar API reference UI — access, Try it Out, and spec update workflow |
 
 ## `.github/` — GitHub & AI Tool Configurations
 

@@ -1,0 +1,241 @@
+openapi: 3.1.0
+
+info:
+  title: go-httpbin API
+  description: |
+    HTTP request/response service used as the System Under Test (SUT) for all k6 performance
+    test scripts in this repository. All k6 scripts target this service via Docker DNS
+    (`http://httpbin:8080`). This Scalar UI connects to the host-exposed port (`http://localhost:8080`).
+  version: 2.22.1
+  contact:
+    name: go-httpbin
+    url: https://github.com/mccutchen/go-httpbin
+
+servers:
+  - url: http://localhost:8080
+    description: httpbin (Docker host-exposed port)
+
+tags:
+  - name: httpbin
+    description: All httpbin endpoints used by k6 test scripts
+
+paths:
+  /get:
+    get:
+      tags:
+        - httpbin
+      summary: Return GET request data
+      description: |
+        Returns JSON reflecting the incoming GET request — headers, args, origin, and URL.
+
+        **Used by:** smoke test (`01-smoke.js`), load test (`02-load.js`)
+      operationId: getGet
+      responses:
+        "200":
+          description: Request data reflected as JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestReflection"
+              example:
+                args: {}
+                headers:
+                  Host: localhost:8080
+                  User-Agent: k6/2.0.0
+                origin: 172.18.0.3
+                url: http://localhost:8080/get
+
+  /post:
+    post:
+      tags:
+        - httpbin
+      summary: Return POST request data
+      description: |
+        Returns JSON reflecting the incoming POST request — headers, body, form data, and JSON payload.
+
+        **Used by:** available for future k6 scripts that test write operations.
+      operationId: postPost
+      requestBody:
+        description: Optional body — any JSON payload will be reflected back
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+            example:
+              key: value
+      responses:
+        "200":
+          description: Request data reflected as JSON including parsed body
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/RequestReflection"
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        description: Raw request body as a string
+                      json:
+                        type: object
+                        nullable: true
+                        description: Parsed JSON body (null if body is not valid JSON)
+
+  /status/{code}:
+    get:
+      tags:
+        - httpbin
+      summary: Return given HTTP status code
+      description: |
+        Returns a response with the exact HTTP status code specified in the path.
+        Useful for testing how clients handle various response codes.
+
+        **Used by:** spike test (`04-spike.js`) — targets `/status/200` to generate high-throughput
+        minimal-latency responses during a 500 VU spike, verifying fast recovery after load.
+      operationId: getStatus
+      parameters:
+        - name: code
+          in: path
+          required: true
+          description: HTTP status code to return (100–599)
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 599
+            example: 200
+      responses:
+        "200":
+          description: Empty response with the requested status code
+        "301":
+          description: Empty response with the requested status code
+        "400":
+          description: Empty response with the requested status code
+        "404":
+          description: Empty response with the requested status code
+        "500":
+          description: Empty response with the requested status code
+
+  /delay/{seconds}:
+    get:
+      tags:
+        - httpbin
+      summary: Delay response by N seconds
+      description: |
+        Sleeps for the given number of seconds before returning a response. Simulates slow
+        upstream dependencies and surfaces latency-sensitive behaviour.
+
+        **Used by:**
+        - Stress test (`03-stress.js`) — `/delay/1` adds a 1 s baseline latency under 300 VUs
+          to expose resource exhaustion at high concurrency.
+        - Soak test (`05-soak.js`) — `/delay/1` provides a stable 1 s floor over 2 hours,
+          making gradual degradation (memory leaks, connection pool exhaustion) visible in metrics.
+      operationId: getDelay
+      parameters:
+        - name: seconds
+          in: path
+          required: true
+          description: Number of seconds to delay the response (0–10)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10
+            example: 1
+      responses:
+        "200":
+          description: Request data reflected as JSON after the delay
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestReflection"
+
+  /headers:
+    get:
+      tags:
+        - httpbin
+      summary: Return request headers
+      description: |
+        Returns only the headers sent with the request as a JSON object.
+
+        **Used by:** available for future k6 scripts that validate header propagation,
+        custom user-agent strings, or authentication header passing.
+      operationId: getHeaders
+      responses:
+        "200":
+          description: Map of all request headers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headers:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: All HTTP headers received in the request
+              example:
+                headers:
+                  Accept-Encoding: gzip
+                  Host: localhost:8080
+                  User-Agent: k6/2.0.0
+
+  /anything:
+    get:
+      tags:
+        - httpbin
+      summary: Return anything passed in the request
+      description: |
+        Returns a full reflection of the request — method, URL, args, headers, body, and
+        parsed JSON. Accepts any HTTP method and any body.
+
+        **Used by:** available for future k6 scripts that need flexible request reflection
+        across multiple content types or methods in a single test scenario.
+      operationId: getAnything
+      responses:
+        "200":
+          description: Full reflection of the incoming request
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/RequestReflection"
+                  - type: object
+                    properties:
+                      method:
+                        type: string
+                        description: HTTP method of the request
+                        example: GET
+                      data:
+                        type: string
+                        description: Raw request body
+                      json:
+                        type: object
+                        nullable: true
+                        description: Parsed JSON body
+
+components:
+  schemas:
+    RequestReflection:
+      type: object
+      description: Standard reflection envelope returned by most httpbin endpoints
+      properties:
+        args:
+          type: object
+          additionalProperties:
+            type: string
+          description: Query string parameters
+          example: {}
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: HTTP headers received in the request
+        origin:
+          type: string
+          description: IP address of the client
+          example: 172.18.0.3
+        url:
+          type: string
+          description: Full URL of the request
+          example: http://localhost:8080/get

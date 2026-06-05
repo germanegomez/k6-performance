@@ -6,6 +6,7 @@
 [![k6](https://img.shields.io/badge/k6-2.0.0-7D64FF?logo=k6)](https://k6.io/)
 [![Prometheus](https://img.shields.io/badge/Prometheus-3.11.3-E6522C?logo=prometheus)](https://prometheus.io/)
 [![Grafana](https://img.shields.io/badge/Grafana-13.0.1-F46800?logo=grafana)](https://grafana.com/)
+[![Scalar](https://img.shields.io/badge/Scalar-0.5.37-000000)](https://scalar.com/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://docs.docker.com/compose/)
 
 Five test scripts (smoke → soak) backed by a Prometheus + Grafana metrics stack. All services run locally via Docker Compose.
@@ -13,8 +14,10 @@ Five test scripts (smoke → soak) backed by a Prometheus + Grafana metrics stac
 | Tool | Role |
 |---|---|
 | **k6** | Load testing engine — runs scripts that simulate virtual users sending HTTP requests |
+| **httpbin** | System under test — predictable HTTP target that reflects requests and simulates real endpoints |
 | **Prometheus** | Time-series database — stores all metrics pushed by k6 via Remote Write |
 | **Grafana** | Visualization layer — queries Prometheus and renders real-time performance dashboards |
+| **Scalar** | API reference UI — renders the OpenAPI spec for httpbin with interactive documentation |
 
 ---
 
@@ -34,6 +37,7 @@ docker compose run --rm k6 run /scripts/01-smoke.js
 |---|---|
 | Grafana (dashboards) | http://localhost:3000 |
 | Prometheus (raw metrics) | http://localhost:9090 |
+| Scalar (API docs) | http://localhost:8090 |
 
 **Tag each run** to filter results in the Grafana dashboard by test execution:
 
@@ -65,6 +69,7 @@ For all commands, test scripts, and debugging: see [docs/development-workflow.md
 | [docs/development-workflow.md](docs/development-workflow.md) | All commands, env vars, debugging, CI/CD |
 | [docs/ai-context.md](docs/ai-context.md) | LLM-optimized context for AI agents |
 | [docs/file-map.md](docs/file-map.md) | File and folder reference |
+| [docs/scalar.md](docs/scalar.md) | Scalar API reference UI — usage, access, and spec update guide |
 
 ---
 
