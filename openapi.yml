@@ -26,7 +26,7 @@ paths:
       description: |
         Returns JSON reflecting the incoming GET request — headers, args, origin, and URL.
 
-        **Used by:** smoke test (`01-smoke.js`), load test (`02-load.js`)
+        **Used by:** smoke test (`01-smoke.js`), load test (`02-load.js`), stress test (`03-stress.js`), spike test (`04-spike.js`)
       operationId: getGet
       responses:
         "200":
@@ -51,7 +51,7 @@ paths:
       description: |
         Returns JSON reflecting the incoming POST request — headers, body, form data, and JSON payload.
 
-        **Used by:** available for write-operation tests and future k6 scripts.
+        **Used by:** load test (`02-load.js`), soak test (`05-soak.js`)
       operationId: postPost
       requestBody:
         description: Optional body — any JSON payload will be reflected back
@@ -91,8 +91,7 @@ paths:
         Useful for testing how clients handle various response codes.
 
         **Used by:** spike test (`04-spike.js`) — targets `/status/200` to generate high-throughput
-        minimal-latency responses during a 500 VU spike, verifying fast recovery after load;
-        stress test (`03-stress.js`) — arbitrary codes used to simulate error conditions.
+        minimal-latency responses during a 500 VU spike, verifying fast recovery after load.
       operationId: getStatus
       parameters:
         - name: code
@@ -128,8 +127,8 @@ paths:
         upstream dependencies and surfaces latency-sensitive behaviour.
 
         **Used by:**
-        - Stress test (`03-stress.js`) — `/delay/1` adds a 1 s baseline latency under 300 VUs
-          to expose resource exhaustion at high concurrency.
+        - Stress test (`03-stress.js`) — `/delay/1` mixed with `/get` to expose resource exhaustion
+          at high concurrency via two different latency profiles.
         - Soak test (`05-soak.js`) — `/delay/1` provides a stable 1 s floor over ~2 hours,
           making gradual degradation (memory leaks, connection pool exhaustion) visible in metrics.
       operationId: getDelay
@@ -159,9 +158,7 @@ paths:
       description: |
         Returns only the headers sent with the request as a JSON object.
 
-        **Used by:** smoke test (`01-smoke.js`) via the general request inspection flow;
-        available for tests that validate header propagation, custom user-agent strings,
-        or authentication header passing.
+        **Used by:** smoke test (`01-smoke.js`) — validates header propagation on every smoke run.
       operationId: getHeaders
       responses:
         "200":
@@ -191,8 +188,8 @@ paths:
         Returns a full reflection of the request — method, URL, args, headers, body, and
         parsed JSON. Accepts any HTTP method and any body.
 
-        **Used by:** load test (`02-load.js`) and stress test (`03-stress.js`) for flexible
-        request reflection; available for multi-method scenarios.
+        **Used by:** load test (`02-load.js`) — included in the mixed-endpoint flow to exercise
+        full request reflection under sustained load.
       operationId: getAnything
       responses:
         "200":
