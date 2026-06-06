@@ -1,9 +1,12 @@
 services:
-  httpbin:
-    image: mccutchen/go-httpbin:2.22.1
-    container_name: httpbin
+  prism:
+    image: stoplight/prism:5
+    container_name: prism
+    command: mock -h 0.0.0.0 -p 8080 --multiprocess=false /tmp/openapi.yml
     ports:
       - "8080:8080"
+    volumes:
+      - ./openapi.yml:/tmp/openapi.yml:ro
     networks:
       - k6-net
     restart: unless-stopped
@@ -43,6 +46,17 @@ services:
       - prometheus
     restart: unless-stopped
 
+  scalar:
+    image: scalarapi/api-reference:0.5.37
+    container_name: scalar
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./openapi.yml:/docs/openapi.yml:ro
+    networks:
+      - k6-net
+    restart: unless-stopped
+
   k6:
     image: grafana/k6:2.0.0
     container_name: k6
@@ -58,6 +72,7 @@ services:
       - k6-net
     depends_on:
       - prometheus
+      - prism
 
 networks:
   k6-net:

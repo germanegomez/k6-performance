@@ -5,7 +5,7 @@
 This repository is a **k6 performance testing suite** with an integrated observability stack.
 
 - **Test runner:** Grafana k6 v2.0.0 (Dockerized)
-- **SUT (System Under Test):** go-httpbin (predictable HTTP target)
+- **SUT (System Under Test):** Prism (OpenAPI mock server)
 - **Metrics:** Prometheus v3 + Grafana v13 (pre-provisioned)
 - **Orchestration:** Docker Compose v2
 
@@ -17,7 +17,7 @@ All work is local. No cloud services or external APIs are involved.
 
 ### What this repo does
 
-Runs 5 types of performance tests against httpbin and visualizes metrics in Grafana:
+Runs 5 types of performance tests against Prism and visualizes metrics in Grafana:
 
 | Script | Type | Peak VUs | Duration |
 |---|---|---|---|
@@ -62,7 +62,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin:8080/<endpoint>');
+  const res = http.get('http://prism:8080/<endpoint>');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(1);
 }
@@ -72,7 +72,7 @@ export default function () {
 
 | Rule | Reason |
 |---|---|
-| Use `http://httpbin:8080/` not `http://localhost:8080/` | Docker DNS routing |
+| Use `http://prism:8080/` not `http://localhost:8080/` | Docker DNS routing |
 | Do not use `require()` | k6 is not Node.js |
 | Always define `thresholds` | Pass/fail gate |
 | Always call `check()` | Response validation |

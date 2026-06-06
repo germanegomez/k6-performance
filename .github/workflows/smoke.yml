@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "Waiting for Prometheus..."
           timeout 60 bash -c 'until curl -sf http://localhost:9090/-/ready; do sleep 2; done'
-          echo "Waiting for httpbin..."
+          echo "Waiting for Prism..."
           timeout 60 bash -c 'until curl -sf http://localhost:8080/get > /dev/null; do sleep 2; done'
 
       - name: Run smoke test

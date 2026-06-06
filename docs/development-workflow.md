@@ -19,7 +19,7 @@ docker compose up -d
 ```
 
 This starts three services:
-- **httpbin** at `http://localhost:8080`
+- **Prism** at `http://localhost:8080`
 - **Prometheus** at `http://localhost:9090`
 - **Grafana** at `http://localhost:3000`
 
@@ -120,7 +120,7 @@ docker compose run --rm \
 
 | Service | URL | Notes |
 |---|---|---|
-| httpbin | `http://localhost:8080/get` | Test the SUT manually |
+| Prism | `http://localhost:8080/get` | Test the SUT manually |
 | Prometheus | `http://localhost:9090` | Query metrics, check targets |
 | Grafana | `http://localhost:3000` | View dashboards |
 | Prometheus targets | `http://localhost:9090/targets` | Verify scrape health |
@@ -140,7 +140,7 @@ docker compose run --rm \
 3. Adjust the time range in Grafana to match when the test ran.
 
 ### Port conflicts
-Stop any local instances of Prometheus (9090), Grafana (3000), or httpbin (8080) before starting the stack.
+Stop any local instances of Prometheus (9090), Grafana (3000), or Prism (8080) before starting the stack.
 
 ---
 

@@ -16,7 +16,7 @@ Every script must follow this structure:
 
 ```js
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check, group, sleep } from 'k6';
 
 // 1. Options block — always at the top, exported as named const
 export const options = {
@@ -29,8 +29,19 @@ export const options = {
 
 // 2. Default function — the virtual user scenario
 export default function () {
-  const res = http.get('http://httpbin:8080/<endpoint>');
-  check(res, { 'status is 200': (r) => r.status === 200 });
+  group('GET /endpoint', () => {
+    const res = http.get('http://prism:8080/<endpoint>');
+    check(res, { 'status is 200': (r) => r.status === 200 });
+  });
+
+  // For POST requests:
+  group('POST /endpoint', () => {
+    const payload = JSON.stringify({ key: 'value' });
+    const params  = { headers: { 'Content-Type': 'application/json' } };
+    const res = http.post('http://prism:8080/<endpoint>', payload, params);
+    check(res, { 'status is 200': (r) => r.status === 200 });
+  });
+
   sleep(N);   // Always include a sleep to avoid hammering
 }
 ```
@@ -40,8 +51,10 @@ export default function () {
 - Always export `options` as a named `const` (not default export).
 - Always define `thresholds` — scripts without thresholds will not fail the run on regressions.
 - Always call `check()` on every response to track the pass/fail rate.
+- Always wrap each endpoint call in a `group()` — enables per-group metrics in Grafana.
 - Always include a `sleep()` to model realistic user think time.
-- Target URLs must use internal Docker DNS names (e.g., `http://httpbin:8080/...`), not `localhost`.
+- Target URLs must use internal Docker DNS names (e.g., `http://prism:8080/...`), not `localhost`.
+- For POST requests, always set `Content-Type: application/json` in the params headers.
 
 ## Thresholds by Test Type
 
@@ -65,10 +78,13 @@ Thresholds represent **SLO-style contracts** — loosen them only when justified
 
 ## Test Script Endpoints
 
-| Scenario | Endpoint | Purpose |
+| Script | Endpoints | Rationale |
 |---|---|---|
-| Fast response | `/get`, `/status/200` | No artificial delay |
-| Latency simulation | `/delay/1` | Adds 1 s baseline; surfaces degradation in stress/soak |
+| `01-smoke.js` | `/get`, `/headers` | Minimal sanity check: response body + header propagation |
+| `02-load.js` | `/get`, `/post`, `/anything` | Mixed read/write flow simulating realistic traffic |
+| `03-stress.js` | `/get`, `/delay/1` | Fast + slow endpoints expose resource exhaustion at high concurrency |
+| `04-spike.js` | `/status/200`, `/get` | Lightweight burst endpoint + content validation during recovery |
+| `05-soak.js` | `/delay/1`, `/post` | Sustained latency read + write to surface memory/connection leaks |
 
 Use `/delay/1` for stress and soak tests to reveal degradation patterns. Use fast endpoints for smoke, load, and spike tests.
 
@@ -104,7 +120,7 @@ Do not add `try/catch` around `http.*` calls unless testing failure-mode scenari
 
 ## Security
 
-- No secrets, credentials, or API keys exist in this project (httpbin requires none).
+- No secrets, credentials, or API keys exist in this project (Prism requires none).
 - If a real target API requiring auth is added, use k6 environment variables (`__ENV.VAR_NAME`) — never hardcode tokens in scripts.
 - Grafana anonymous admin is **local development only** — disable before any shared deployment.
 
