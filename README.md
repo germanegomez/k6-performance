@@ -11,6 +11,31 @@
 
 Five test scripts (smoke → soak) backed by a Prometheus + Grafana metrics stack. All services run locally via Docker Compose.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    openapi["📄 openapi.yml"]
+    scripts["📁 scripts/*.js"]
+
+    subgraph net["k6-net · Docker bridge"]
+        prism["🎭 Prism\nMock API · :8080"]
+        scalar["📖 Scalar\nAPI Docs · :8090"]
+        k6["⚡ k6\nTest Runner"]
+        prom["🔥 Prometheus\nMetrics · :9090"]
+        graf["📊 Grafana\nDashboards · :3000"]
+    end
+
+    openapi -->|"spec"| prism
+    openapi -->|"spec"| scalar
+    scripts -->|"mounted read-only"| k6
+    k6 -->|"HTTP requests"| prism
+    k6 -->|"Remote Write"| prom
+    prom -->|"PromQL"| graf
+```
+
+---
+
 | Tool | Role |
 |---|---|
 | **k6** | Load testing engine — runs scripts that simulate virtual users sending HTTP requests |
