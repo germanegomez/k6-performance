@@ -3,7 +3,7 @@
 ## Project Identity
 
 Dockerized k6 performance testing suite with Prometheus + Grafana observability.
-Stack: k6 v2 · go-httpbin · Prometheus v3 · Grafana v13 · Docker Compose.
+Stack: k6 v2 · Prism · Prometheus v3 · Grafana v13 · Docker Compose.
 
 ## Language & Runtime
 
@@ -14,7 +14,7 @@ Stack: k6 v2 · go-httpbin · Prometheus v3 · Grafana v13 · Docker Compose.
 ## URL Convention
 
 All HTTP calls in scripts MUST use Docker internal DNS:
-- Correct: `http://httpbin/get`
+- Correct: `http://prism:8080/get`
 - Wrong: `http://localhost:8080/get`
 
 ## Script Template
@@ -32,7 +32,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin/get');
+  const res = http.get('http://prism:8080/get');
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(1);
 }

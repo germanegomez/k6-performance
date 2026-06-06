@@ -1,11 +1,15 @@
 services:
-  httpbin:
-    image: mccutchen/go-httpbin:2.22.1
-    container_name: httpbin
+  prism:
+    image: stoplight/prism:5
+    container_name: prism
+    command: mock -h 0.0.0.0 -p 8080 /tmp/openapi.yml
     ports:
       - "8080:8080"
+    volumes:
+      - ./openapi.yml:/tmp/openapi.yml:ro
     networks:
       - k6-net
+    restart: unless-stopped
   
   prometheus:
     image: prom/prometheus:v3.11.3

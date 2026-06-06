@@ -45,7 +45,8 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://httpbin:8080/<endpoint>');  // Docker DNS, not localhost
+  const res = http.get('http://prism:8080/<endpoint>');  // Docker DNS, not localhost
+  // Prism validates requests against openapi.yml — ensure endpoints used in scripts exist in the spec.
   check(res, { 'status is 200': (r) => r.status === 200 });
   sleep(1);
 }
@@ -70,9 +71,10 @@ export default function () {
 ## Architecture
 
 ```
-k6 → httpbin (HTTP requests)
+k6 → Prism (HTTP requests, validated against openapi.yml)
 k6 → Prometheus (Remote Write metrics)
 Grafana → Prometheus (PromQL queries)
+Scalar → openapi.yml (documentation UI)
 ```
 
 All services on `k6-net` Docker bridge. k6 is `profiles: [manual]`.

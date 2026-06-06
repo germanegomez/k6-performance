@@ -17,7 +17,7 @@ Manual, ad-hoc performance testing lacks repeatability and observability. This p
 | Layer | Tool | Version |
 |---|---|---|
 | Test runner | [Grafana k6](https://k6.io/) | 2.0.0 |
-| Target / SUT | [go-httpbin](https://github.com/mccutchen/go-httpbin) | 2.22.1 |
+| Target / SUT | [Stoplight Prism](https://stoplight.io/open-source/prism) | 5 |
 | Metrics storage | [Prometheus](https://prometheus.io/) | 3.11.3 |
 | Visualization | [Grafana](https://grafana.com/) | 13.0.1 |
 | Orchestration | Docker Compose | v2+ |
@@ -74,7 +74,7 @@ k6 (test runner)
 
 | Service | Port | Notes |
 |---|---|---|
-| httpbin (SUT) | 8080 | Target for all k6 requests |
+| Prism (SUT) | 8080 | Target for all k6 requests |
 | Prometheus | 9090 | Metrics store; remote write enabled |
 | Grafana | 3000 | Dashboard UI; anonymous admin access |
 | k6 | — | Run manually via `docker compose run` |

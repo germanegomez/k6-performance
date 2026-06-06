@@ -1,29 +1,27 @@
 openapi: 3.1.0
 
 info:
-  title: go-httpbin API
+  title: Prism Mock API
   description: |
     HTTP request/response service used as the System Under Test (SUT) for all k6 performance
-    test scripts in this repository. All k6 scripts target this service via Docker DNS
-    (`http://httpbin:8080`). This Scalar UI connects to the host-exposed port (`http://localhost:8080`).
-  version: 2.22.1
-  contact:
-    name: go-httpbin
-    url: https://github.com/mccutchen/go-httpbin
+    test scripts in this repository. Served by Stoplight Prism as a mock server validated
+    against this spec. All k6 scripts target this service via Docker DNS (`http://prism:8080`).
+    The Scalar UI connects to the host-exposed port (`http://localhost:8080`).
+  version: 1.0.0
 
 servers:
   - url: http://localhost:8080
-    description: httpbin (Docker host-exposed port)
+    description: Prism mock server (Docker host-exposed port)
 
 tags:
-  - name: httpbin
-    description: All httpbin endpoints used by k6 test scripts
+  - name: prism
+    description: All mock endpoints used by k6 test scripts
 
 paths:
   /get:
     get:
       tags:
-        - httpbin
+        - prism
       summary: Return GET request data
       description: |
         Returns JSON reflecting the incoming GET request — headers, args, origin, and URL.
@@ -48,12 +46,12 @@ paths:
   /post:
     post:
       tags:
-        - httpbin
+        - prism
       summary: Return POST request data
       description: |
         Returns JSON reflecting the incoming POST request — headers, body, form data, and JSON payload.
 
-        **Used by:** available for future k6 scripts that test write operations.
+        **Used by:** available for write-operation tests and future k6 scripts.
       operationId: postPost
       requestBody:
         description: Optional body — any JSON payload will be reflected back
@@ -86,14 +84,15 @@ paths:
   /status/{code}:
     get:
       tags:
-        - httpbin
+        - prism
       summary: Return given HTTP status code
       description: |
         Returns a response with the exact HTTP status code specified in the path.
         Useful for testing how clients handle various response codes.
 
         **Used by:** spike test (`04-spike.js`) — targets `/status/200` to generate high-throughput
-        minimal-latency responses during a 500 VU spike, verifying fast recovery after load.
+        minimal-latency responses during a 500 VU spike, verifying fast recovery after load;
+        stress test (`03-stress.js`) — arbitrary codes used to simulate error conditions.
       operationId: getStatus
       parameters:
         - name: code
@@ -114,13 +113,15 @@ paths:
           description: Empty response with the requested status code
         "404":
           description: Empty response with the requested status code
+        "429":
+          description: Empty response with the requested status code
         "500":
           description: Empty response with the requested status code
 
   /delay/{seconds}:
     get:
       tags:
-        - httpbin
+        - prism
       summary: Delay response by N seconds
       description: |
         Sleeps for the given number of seconds before returning a response. Simulates slow
@@ -129,7 +130,7 @@ paths:
         **Used by:**
         - Stress test (`03-stress.js`) — `/delay/1` adds a 1 s baseline latency under 300 VUs
           to expose resource exhaustion at high concurrency.
-        - Soak test (`05-soak.js`) — `/delay/1` provides a stable 1 s floor over 2 hours,
+        - Soak test (`05-soak.js`) — `/delay/1` provides a stable 1 s floor over ~2 hours,
           making gradual degradation (memory leaks, connection pool exhaustion) visible in metrics.
       operationId: getDelay
       parameters:
@@ -153,13 +154,14 @@ paths:
   /headers:
     get:
       tags:
-        - httpbin
+        - prism
       summary: Return request headers
       description: |
         Returns only the headers sent with the request as a JSON object.
 
-        **Used by:** available for future k6 scripts that validate header propagation,
-        custom user-agent strings, or authentication header passing.
+        **Used by:** smoke test (`01-smoke.js`) via the general request inspection flow;
+        available for tests that validate header propagation, custom user-agent strings,
+        or authentication header passing.
       operationId: getHeaders
       responses:
         "200":
@@ -183,14 +185,14 @@ paths:
   /anything:
     get:
       tags:
-        - httpbin
+        - prism
       summary: Return anything passed in the request
       description: |
         Returns a full reflection of the request — method, URL, args, headers, body, and
         parsed JSON. Accepts any HTTP method and any body.
 
-        **Used by:** available for future k6 scripts that need flexible request reflection
-        across multiple content types or methods in a single test scenario.
+        **Used by:** load test (`02-load.js`) and stress test (`03-stress.js`) for flexible
+        request reflection; available for multi-method scenarios.
       operationId: getAnything
       responses:
         "200":
@@ -218,7 +220,7 @@ components:
   schemas:
     RequestReflection:
       type: object
-      description: Standard reflection envelope returned by most httpbin endpoints
+      description: Standard reflection envelope returned by most mock endpoints
       properties:
         args:
           type: object

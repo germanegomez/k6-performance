@@ -14,10 +14,10 @@ Five test scripts (smoke → soak) backed by a Prometheus + Grafana metrics stac
 | Tool | Role |
 |---|---|
 | **k6** | Load testing engine — runs scripts that simulate virtual users sending HTTP requests |
-| **httpbin** | System under test — predictable HTTP target that reflects requests and simulates real endpoints |
+| **Prism** | OpenAPI mock server — serves predictable responses from `openapi.yml` for k6 to test against |
 | **Prometheus** | Time-series database — stores all metrics pushed by k6 via Remote Write |
 | **Grafana** | Visualization layer — queries Prometheus and renders real-time performance dashboards |
-| **Scalar** | API reference UI — renders the OpenAPI spec for httpbin with interactive documentation |
+| **Scalar** | API documentation UI — renders `openapi.yml` with interactive Try it out |
 
 ---
 
@@ -37,6 +37,7 @@ docker compose run --rm k6 run /scripts/01-smoke.js
 |---|---|
 | Grafana (dashboards) | http://localhost:3000 |
 | Prometheus (raw metrics) | http://localhost:9090 |
+| Prism (mock API target) | http://localhost:8080 |
 | Scalar (API docs) | http://localhost:8090 |
 
 **Tag each run** to filter results in the Grafana dashboard by test execution:
@@ -69,7 +70,7 @@ For all commands, test scripts, and debugging: see [docs/development-workflow.md
 | [docs/development-workflow.md](docs/development-workflow.md) | All commands, env vars, debugging, CI/CD |
 | [docs/ai-context.md](docs/ai-context.md) | LLM-optimized context for AI agents |
 | [docs/file-map.md](docs/file-map.md) | File and folder reference |
-| [docs/scalar.md](docs/scalar.md) | Scalar API reference UI — usage, access, and spec update guide |
+| [docs/api-layer.md](docs/api-layer.md) | Prism mock server, Scalar docs UI, openapi.yml usage |
 
 ---
 

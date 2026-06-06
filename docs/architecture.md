@@ -9,7 +9,7 @@ The project runs a **fully containerized performance testing stack** on a single
 │                      k6-net (bridge)                      │
 │                                                           │
 │  ┌──────────┐   HTTP   ┌──────────┐                       │
-│  │   k6     │─────────►│ httpbin  │  :8080                │
+│  │   k6     │─────────►│  prism   │  :8080                │
 │  │(runner)  │          │  (SUT)   │                       │
 │  └────┬─────┘          └──────────┘                       │
 │       │ Remote Write                                      │
@@ -30,9 +30,10 @@ The project runs a **fully containerized performance testing stack** on a single
 - Pushes metrics via `K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write`.
 - Native histograms enabled: `K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true`.
 
-### httpbin (System Under Test)
-- Image: `mccutchen/go-httpbin:2.22.1`
-- A predictable HTTP testing utility that responds to standard HTTP verbs.
+### Prism (System Under Test)
+- Image: `stoplight/prism:5`
+- An OpenAPI mock server that reads `openapi.yml` and serves spec-compliant responses.
+- Validates incoming requests against the spec before responding.
 - Endpoints used across scripts:
   - `/get` — simple GET, instant response.
   - `/delay/1` — 1-second artificial delay (used in stress & soak tests).
@@ -62,7 +63,7 @@ The project runs a **fully containerized performance testing stack** on a single
    docker compose run --rm k6 run /scripts/01-smoke.js
 
 2. k6 executes the script:
-   - Sends HTTP requests to httpbin (http://httpbin:8080/<endpoint>)
+   - Sends HTTP requests to Prism (http://prism:8080/<endpoint>)
    - Collects metrics (duration, errors, VUs, etc.)
 
 3. k6 pushes metrics:
@@ -82,12 +83,12 @@ The project runs a **fully containerized performance testing stack** on a single
 
 | Service | Internal hostname | Exposed port |
 |---|---|---|
-| httpbin | `httpbin` | `8080` |
+| Prism | `prism` | `8080` |
 | Prometheus | `prometheus` | `9090` |
 | Grafana | `grafana` | `3000` |
 | k6 | `k6` | none |
 
-All inter-service communication uses internal Docker DNS names (e.g., `http://httpbin:8080/get`).
+All inter-service communication uses internal Docker DNS names (e.g., `http://prism:8080/get`).
 
 ## Volumes
 
@@ -103,7 +104,7 @@ All inter-service communication uses internal Docker DNS names (e.g., `http://ht
 
 ```mermaid
 graph TD
-    k6["k6 (test runner)<br/>profile: manual"] -->|HTTP requests| httpbin["httpbin (SUT)<br/>:8080"]
+    k6["k6 (test runner)<br/>profile: manual"] -->|HTTP requests| prism["Prism (SUT)<br/>:8080"]
     k6 -->|Remote Write| prometheus["Prometheus<br/>:9090"]
     grafana["Grafana<br/>:3000"] -->|PromQL queries| prometheus
     grafana -.->|depends_on| prometheus
@@ -116,5 +117,5 @@ graph TD
 | k6 under `manual` profile | Prevents k6 from starting with `docker compose up`; tests are triggered explicitly |
 | Native histograms enabled | Higher-fidelity p95/p99 latency data in Prometheus |
 | Anonymous Grafana admin | Simplifies local developer experience; not suitable for production |
-| go-httpbin as SUT | Deterministic, zero-config target; supports latency simulation (`/delay/N`) |
+| Prism as SUT | OpenAPI mock server — validates requests against `openapi.yml`; supports latency simulation (`/delay/N`) |
 | Read-only volume mounts | Prevents container from modifying host config files |
